@@ -21,10 +21,8 @@ state_codes = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
           "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"]
 
 
-
 covid_deaths = pd.read_csv('time_series_covid_19_deaths_US.csv')
-#alabama = covid_deaths.loc[covid_deaths["Province_State"] == "Alabama", "1/22/20":]
-#alabama = covid_deaths.loc[covid_deaths["Province_State"] == "Alabama", "1/22/20"]
+covid_cases = pd.read_csv('time_series_covid_19_confirmed_US.csv')
 
 start_date = datetime.date(2020, 1, 22)
 
@@ -37,12 +35,54 @@ def state_date_death_count(state, date):
     """Returns death count by state + date."""
     return sum(covid_deaths.loc[covid_deaths["Province_State"] == state, date])
 
+def state_date_case_count(state, date):
+    """Returns case count by state + date."""
+    return sum(covid_cases.loc[covid_cases["Province_State"] == state, date])
+
+state_cases = {}
 state_deaths = {}
 
 for n in range(50):
     state_deaths[state_codes[n]] = state_date_death_count(states[n], days_from_start(119))
 
-fig = go.Figure(data=go.Choropleth(
+for n in range(50):
+    state_cases[state_codes[n]] = state_date_case_count(states[n], days_from_start(119))
+
+data_cases = dict(type='choropleth',
+    locations=tuple(state_cases.keys()),
+    z = tuple(state_cases.values()),
+    locationmode = 'USA-states',
+    colorscale = [
+            [0, 'rgb(255, 233, 229)'],
+            [0.01, 'rgb(225, 233, 229)'],
+
+            [0.01, 'rgb(255, 175, 161)'],
+            [0.05, 'rgb(255, 175, 161)'],
+
+            [0.05, 'rgb(255, 116, 92)'],
+            [0.1, 'rgb(255, 116, 92)'],
+
+            [0.1, 'rgb(255, 58, 23)'],
+            [0.5, 'rgb(255, 58, 23)'],
+
+            [0.5, 'rgb(154, 25, 3)'],
+            [1.0, 'rgb(154, 25, 3)'],
+            ],
+    colorbar = dict(title="Covid-19 cases", len=0.5, y=0.8,
+                    tickvals=[1,500,7500,30000,75000],
+                    ticktext=["0 - 1000",
+                              "1000 - 5000",
+                              "5000 - 10000",
+                              "10000 - 50000",
+                              " > 50000"],
+                    ),
+    zmax = 100000,
+    zmid = 50000,
+    zmin = 0,
+    geo = 'geo2',
+    )
+
+data_deaths = dict(type='choropleth',
     locations=tuple(state_deaths.keys()),
     z = tuple(state_deaths.values()),
     locationmode = 'USA-states',
@@ -60,17 +100,19 @@ fig = go.Figure(data=go.Choropleth(
             [0.5, 'rgb(51, 51, 51)'],
 
             [0.5, 'rgb(0, 0, 0)'],
-            [1.0, 'rgb(0, 0, 0)']
+            [1.0, 'rgb(0, 0, 0)'],
             ],
-    colorbar_title = "Covid-19 deaths",
+    colorbar = dict(title = "Covid-19 deaths", len=0.5, y = 0.3),
     zmax = 10000,
     zmid = 5000,
-    zmin = 0
-    ))
-
-fig.update_layout(
-    title_text = "Covid-19 deaths",
-    geo_scope='usa',
+    zmin = 0,
+    geo = 'geo',
     )
 
+layout = dict(title_text="Covid cases / Covid deaths", height=900)
+layout['geo'] = dict(scope='usa', domain = dict(x = [0, 1.0], y = [0, 0.5]))
+layout['geo2'] = dict(scope='usa', domain = dict(x = [0, 1.0], y = [0.5, 1.0]))
+
+fig = go.Figure(data=[data_cases, data_deaths], layout=layout)
+fig.update_layout(title_text="Covid cases / Covid deaths")
 fig.show()
