@@ -68,8 +68,8 @@ data_cases = dict(type='choropleth',
             [0.5, 'rgb(154, 25, 3)'],
             [1.0, 'rgb(154, 25, 3)'],
             ],
-    colorbar = dict(title="Covid-19 cases", len=0.5, y=0.8,
-                    tickvals=[1,500,7500,30000,75000],
+    colorbar = dict(title="Cases", len=0.5, y=0.8,
+                    tickvals=[1,3000,7500,30000,75000],
                     ticktext=["0 - 1000",
                               "1000 - 5000",
                               "5000 - 10000",
@@ -87,32 +87,39 @@ data_deaths = dict(type='choropleth',
     z = tuple(state_deaths.values()),
     locationmode = 'USA-states',
     colorscale = [
-            [0, 'rgb(204, 204, 204)'],
-            [0.02, 'rgb(204, 204, 204)'],
+            [0, 'rgb(230, 230, 230)'],
+            [0.01, 'rgb(230, 230, 230)'],
 
-            [0.02, 'rgb(153, 153, 153)'],
+            [0.01, 'rgb(204, 204, 204)'],
+            [0.05, 'rgb(204, 204, 204)'],
+
+            [0.05, 'rgb(153, 153, 153)'],
             [0.1, 'rgb(153, 153, 153)'],
 
             [0.1, 'rgb(102, 102, 102)'],
-            [0.2, 'rgb(102, 102, 102)'],
+            [0.5, 'rgb(102, 102, 102)'],
 
-            [0.2, 'rgb(51, 51, 51)'],
             [0.5, 'rgb(51, 51, 51)'],
-
-            [0.5, 'rgb(0, 0, 0)'],
-            [1.0, 'rgb(0, 0, 0)'],
+            [1.0, 'rgb(51, 51, 51)'],
             ],
-    colorbar = dict(title = "Covid-19 deaths", len=0.5, y = 0.3),
+    colorbar = dict(title = "Deaths", len=0.5, y = 0.2,
+                    tickvals=[1,300,750,3000, 7500],
+                    ticktext=["0 - 100",
+                              "100 - 500",
+                              "500 - 1000",
+                              "1000 - 5000",
+                              " > 5000"],
+                    ),
     zmax = 10000,
     zmid = 5000,
     zmin = 0,
     geo = 'geo',
     )
 
-layout = dict(title_text="Covid cases / Covid deaths", height=900)
+layout = dict(title_text="Covid-19 in the U.S.", height=800)
 layout['geo'] = dict(scope='usa', domain = dict(x = [0, 1.0], y = [0, 0.5]))
 layout['geo2'] = dict(scope='usa', domain = dict(x = [0, 1.0], y = [0.5, 1.0]))
 
 fig = go.Figure(data=[data_cases, data_deaths], layout=layout)
-fig.update_layout(title_text="Covid cases / Covid deaths")
+#fig.update_layout(title_text="Covid-19 in the U.S.")
 fig.show()
